@@ -7,7 +7,7 @@ model = MNISTClassifier()
 model.load_state_dict(torch.load("mnist_model.pth"))    # Load state (learned parameters)
 model.eval()
 
-_, test_loader = get_dataloader()
+_, test_loader = get_dataloader()   # Get the test data
 
 correct, total = 0, 0   # Track the number of correct predictions
 with torch.no_grad():
