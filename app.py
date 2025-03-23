@@ -10,11 +10,16 @@ import cv2
 import psycopg2
 from sqlalchemy import create_engine, text
 from datetime import datetime
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 # Database setup
-DB_USER = "amyfreear"
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = "mnist_predictions"
-engine = create_engine(f"postgresql://{DB_USER}@localhost/{DB_NAME}")
+engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@localhost/{DB_NAME}")
 
 # Load the trained model
 model = MNISTClassifier()
@@ -79,6 +84,10 @@ def save_prediction(predicted_digit, true_label=None):
     timestamp = datetime.now()
 
     with engine.connect() as connection:
+        query = text("SELECT current_user;")
+        result = connection.execute(query).scalar()
+        print(f"Current User: {result}")
+
         query = text("""
             INSERT INTO predictions (timestamp, predicted_digit, true_label)
             VALUES (:timestamp, :predicted_digit, :true_label);
