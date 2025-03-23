@@ -7,6 +7,14 @@ from model import MNISTClassifier
 from streamlit_drawable_canvas import st_canvas
 import matplotlib.pyplot as plt
 import cv2 
+import psycopg2
+from sqlalchemy import create_engine, text
+from datetime import datetime
+
+# Database setup
+DB_USER = "amyfreear"
+DB_NAME = "mnist_predictions"
+engine = create_engine(f"postgresql://{DB_USER}@localhost/{DB_NAME}")
 
 # Load the trained model
 model = MNISTClassifier()
@@ -66,6 +74,18 @@ def preprocess_image(image_data):
     # st.pyplot(fig)  # Display in Streamlit
     # return image.unsqueeze(0)
 
+def save_prediction(predicted_digit, true_label=None):
+    """Saves the prediction to the PostgreSQL database."""
+    timestamp = datetime.now()
+
+    with engine.connect() as connection:
+        query = text("""
+            INSERT INTO predictions (timestamp, predicted_digit, true_label)
+            VALUES (:timestamp, :predicted_digit, :true_label);
+        """)
+        connection.execute(query, {'timestamp': timestamp, 'predicted_digit': predicted_digit, 'true_label': true_label if true_label else None})
+        connection.commit()
+
 # Streamlit app
 st.title("MNIST Digit Prediction")
 
@@ -81,6 +101,9 @@ canvas_result = st_canvas(
     key="canvas"
 )
 
+# Input for true label
+true_label = st.text_input("Enter the real digit value (optional)")
+
 if st.button("Predict"):
     if canvas_result.image_data is not None:
         image_data = np.array(canvas_result.image_data)
@@ -90,12 +113,7 @@ if st.button("Predict"):
         prediction = torch.argmax(output, dim=1).item()
         confidence = torch.max(torch.nn.functional.log_softmax(output, dim=1)).exp().item()
 
+        save_prediction(prediction, true_label if true_label else None)
+
         st.write(f"Predicted Digit: {prediction}")
         st.write(f"Confidence: {confidence * 100:.2f}%")
-
-# Input for true label
-true_label = st.text_input("Enter the real digit value (optional)")
-
-# Optionally, you can store or log the true label for further use
-if true_label:
-    st.write(f"True Label: {true_label}")
