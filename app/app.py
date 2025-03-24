@@ -58,7 +58,6 @@ if st.button("Predict"):
         response = requests.post(f"{FASTAPI_URL}/predict", json={"image_data": image_data})
 
         response_json = response.json()
-        st.write(f"response is {response_json}")
         prediction = response_json["prediction"]
         confidence = response_json["confidence"]
 
