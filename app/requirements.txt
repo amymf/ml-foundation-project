@@ -1,0 +1,11 @@
+streamlit==1.43.2
+requests==2.32.3
+torch==2.6.0
+opencv-python==4.11.0.86
+numpy==2.0.2
+pillow==11.1.0
+streamlit-drawable-canvas==0.9.3
+SQLAlchemy==2.0.39
+dotenv==0.9.9
+requests==2.32.3
+psycopg2-binary==2.9.10

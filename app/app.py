@@ -1,6 +1,5 @@
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
-import psycopg2
 from sqlalchemy import create_engine, text
 from datetime import datetime
 from dotenv import load_dotenv
@@ -14,7 +13,7 @@ load_dotenv()
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_NAME = "mnist_predictions"
-engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@localhost/{DB_NAME}")
+engine = create_engine(f"postgresql://{DB_USER}:{DB_PASSWORD}@db:5432/{DB_NAME}")
 
 FASTAPI_URL = os.getenv("FASTAPI_URL", "http://api:8000")
 
